@@ -35,7 +35,7 @@ print r['mime']
 print r['data']
 ```
 
-### Get results with proxy
+### Get resources with proxy
 Get resource saved and mime-type by proxy
 
 ```python
