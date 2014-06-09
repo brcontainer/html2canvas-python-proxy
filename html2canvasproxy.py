@@ -1,4 +1,4 @@
-# html2canvas-python-proxy 0.0.1
+# html2canvas-python-proxy 0.0.2
 # Copyright (c) 2014 Guilherme Nascimento (brcontainer@yahoo.com.br)
 #
 # Released under the MIT license
@@ -29,7 +29,7 @@ class html2canvasproxy:
     response = ''
     default_callback = 'console.log'
     status = 0
-    route = ''
+    routePath = ''
     savePath = '/'
     prefix = 'htc_'
     real_extension = ''
@@ -59,15 +59,16 @@ class html2canvasproxy:
         self.downloadSource()
 
     def downloadSource(self):
-        try:
-            if self.ref == '':
-                o = urlparse.urlparse(url)
-                self.scheme = o.scheme
-                self.host = o.netloc
+        if self.ref == '':
+            #o = urlparse.urlparse(self.referer)
+            #self.scheme = o.scheme
+            #self.host = o.netloc
 
-                headers = { 'User-Agent' : self.ua, 'Referer': self.ref }
-            else:
-                headers = { 'User-Agent' : self.ua }
+            headers = { 'User-Agent' : self.ua }
+        else:
+            headers = { 'User-Agent' : self.ua, 'Referer': self.ref }
+
+        try:
 
             req = urllib2.Request(self.url, None, headers)
             r = urllib2.urlopen(req)
@@ -110,11 +111,18 @@ class html2canvasproxy:
 
             os.rename(self.savePath + file_name + '.' + tmp_ext, self.savePath + '/' + file_name + '.' + self.real_extension)
 
-            self.setResponse(self.scheme + '://' + self.host + self.route + file_name + '.' + self.real_extension)
+            self.setResponse(self.scheme + '://' + self.host + self.routePath + file_name + '.' + self.real_extension)
 
+    def hostName(self, url):
+        if url == '' or url is None:
+            self.setResponse('error:No such host in html2canvasproxy.hostName("url")')
+        elif self.ref == '':
+            o = urlparse.urlparse(url)
+
+            self.scheme = o.scheme
+            self.host = o.netloc
+        
     def referer(self, url):
-        url = str(url)
-
         if url == '' or url is None:
             self.setResponse('error:No such referer in html2canvasproxy.referer("url")')
         if html2canvasproxy.isHttpUrl(url) == False:
@@ -135,7 +143,7 @@ class html2canvasproxy:
                 self.setResponse('error:Not found ' + currentPath)
             else:
                 self.savePath = html2canvasproxy.fixPath(currentPath)
-                self.route = route
+                self.routePath = route
 
     def userAgent(self, ua):
         self.ua = ua
@@ -150,6 +158,26 @@ class html2canvasproxy:
         if self.response == '':
             self.status = 2
             self.response = str(resp)
+
+    def debug_variables(self):
+        return [
+            'folder => ' + self.folder,
+            'timeout => ' + self.timeout,
+            'mimetype => ' + self.mimetype,
+            'ua => ' + self.ua,
+            'host => ' + self.host,
+            'scheme => ' + self.scheme,
+            'ref => ' + self.ref,
+            'url => ' + self.url,
+            'callback => ' + self.callback,
+            'default_callback => ' + self.default_callback,
+            'status => ' + self.status,
+            'routePath => ' + self.routePath,
+            'savePath => ' + self.savePath,
+            'prefix => ' + self.prefix,
+            'real_extension => ' + self.real_extension,
+            'mimes => ' + self.mimes
+        ]
 
     @staticmethod
     def fixPath(path):
@@ -167,6 +195,9 @@ class html2canvasproxy:
             fileName, ext = os.path.splitext(f)
 
             mime = 'application/octet-stream'
+
+            ext = re.sub('^[.]', '', ext)
+
             if re.match('^(jp|bm|gi|pn)', ext) is not None:
                 mime = 'image/' + ext
             elif ext == 'xhtml':
