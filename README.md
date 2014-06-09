@@ -25,7 +25,8 @@ html2canvasproxy.userAgent([user agent]) | Config webbrowser user-agent | `h2c.u
 `html2canvasproxy.result()` | Run proxy/Get response and mime-type by proxy | Read [Get results with proxy]
 `html2canvasproxy.resource([real path], [image])` | Get resource saved and mime-type by proxy "real path" is same in `html2canvas.route([real path], [virtual path])` | Read [Get resources with proxy]
 
-#Get results with proxy
+### Get results with proxy
+Run proxy/Get response and mime-type by proxy
 
 ```python
 r = h2c.result()
