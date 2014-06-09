@@ -2,8 +2,6 @@
 # Copyright (c) 2014 Guilherme Nascimento (brcontainer@yahoo.com.br)
 #
 # Released under the MIT license
-#
-# Fixed h.referer, added .debug, added hostName, fixed mime-type in .resource
 
 import random
 import time
