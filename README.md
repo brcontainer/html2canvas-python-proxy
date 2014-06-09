@@ -1,9 +1,17 @@
 html2canvas-proxy-python
 ========================
 
-Python Proxy for html2canvas (Tested in Python 2.7.3)
+Python Proxy for html2canvas (tested in Python 2.7.3)
 
 Although I have just added an example with "Flask" is library works with any "Python Web framework." Soon I'll add examples with other frameworks.
+
+### Others scripting language ###
+
+You do not use PHP, but need html2canvas working with proxy, see other proxies:
+
+* [html2canvas proxy in php](https://github.com/brcontainer/html2canvas-php-proxy)
+* [html2canvas proxy in asp.net (csharp)](https://github.com/brcontainer/html2canvas-csharp-proxy)
+* [html2canvas proxy in asp classic (vbscript)](https://github.com/brcontainer/html2canvas-asp-vbscript-proxy)
 
 ### Provisional documentation:
 
