@@ -41,6 +41,9 @@ def html2canvas_proxy():
 
     h2c.route(real_path, virtual_path)
 
+    if request.args.get('debug_vars'): #
+        return Response((',\n'.join(h2c.debug_vars())), mimetype='text/plain')
+
     r = h2c.result()
 
     return Response(r['data'], mimetype=r['mime'])
