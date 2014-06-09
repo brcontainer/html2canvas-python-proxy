@@ -1,7 +1,9 @@
 # Example with flask
 #
-# Usage: python flask-framework.py
-# Open browser http://127.0.0.1:5000/test-case/
+# Usage:
+# Copy html2canvasproxy.py to project folder
+# In terminal: python main.py
+# Open browser with: http://127.0.0.1:5000/test-case/
 
 from html2canvasproxy import * #include html2canvasproxy in your application
 from flask import Flask, request, Response, render_template
