@@ -3,8 +3,8 @@
 # Usage: python flask-framework.py
 # Open browser http://127.0.0.1:5000/test-case/
 
+from html2canvasproxy import * #include html2canvasproxy in your application
 from flask import Flask, request, Response, render_template
-from html2canvasproxy import *
 import urlparse
 import os
 import re
@@ -16,18 +16,22 @@ h2c = None
 real_path = os.getcwd() + '/images'
 virtual_path = '/test-case/html2canvas/images/'
 
+#Index/Root page
 @app.route('/')
 def index():
     return 'Index Page'
 
+#Page for test-case http://127.0.0.1:5000/test-case/
 @app.route('/test-case/')
 def test_case():
     return app.send_static_file('test-case.html')
-    
+
+#Copy html2canvas.js to static folder (If not use cdns)
 @app.route('/test-case/html2canvas.js')
 def html2canvas_js():
     return app.send_static_file('html2canvas.js')
 
+#Proxy url, http://127.0.0.1:5000/test-case/html2canvas-proxy?callback=function&url=http://page
 @app.route('/test-case/html2canvas-proxy')
 def html2canvas_proxy():
     h2c = html2canvasproxy(request.args.get('callback'), request.args.get('url'))
@@ -42,6 +46,7 @@ def html2canvas_proxy():
 
     return Response(r['data'], mimetype=r['mime'])
 
+#Get images saved by html2canvasproxy
 @app.route('/test-case/html2canvas/images/<image>')
 def images(image):
     res = html2canvasproxy.resource(real_path, image)
