@@ -15,40 +15,29 @@ You do not use PHP, but need html2canvas working with proxy, see other proxies:
 
 ### Provisional documentation:
 
-#### Import modules
+Module | Description | Usage/Example
+--- | --- | ---
+* | For import module, add this in your .py file (on document top) | `from html2canvasproxy import *`
+html2canvasproxy([callback get param], [url get param]) | Config html2canvasproxy | `h2c = html2canvasproxy(request.args.get("callback"), request.args.get("url"))`
+html2canvasproxy.userAgent([user agent]) | Config webbrowser user-agent | `h2c.userAgent(request.headers['user_agent'])`
+`html2canvasproxy.referer([referer])` | Config referer page (If needed) | `h2c.referer(request.referer)`
+`html2canvasproxy.route([real path], [virtual path])` | Config "route" for images and real path (folder to save images). Note: "real path" is absolute path eg. `/home/user/project1/images`, "virtual path" should be as you want it to appear in the "address bar", eg. `/images` | `h2c.route('/home/guilherme/projects/site/images', '/images')`
+`html2canvasproxy.result()` | Run proxy/Get response and mime-type by proxy | Read [Get results with proxy]
+`html2canvasproxy.resource([real path], [image])` | Get resource saved and mime-type by proxy "real path" is same in `html2canvas.route([real path], [virtual path])` | Read [Get resources with proxy]
 
-For import module, add this in your .py file (on top):
+#Get results with proxy
 
-`from html2canvasproxy import *`
-
-Config html2canvasproxy (`h2c` is an variable):
-
-`h2c = html2canvasproxy([callback get param], [url get param])`
-
-Config webbrowser user-agent:
-
-`h2c.userAgent([user agent])`
-
-Config referer page (If needed):
-
-`h2c.referer([referer])`
-
-Config "route" for images and real path (folder to save images):
-
-`h2c.route([real path], [virtual path])`
-
-Run proxy/Get response and mime-type by proxy:
-
-```py
+```python
 r = h2c.result()
 
 print r['mime']
 print r['data']
 ```
 
-Get resource saved and mime-type by proxy:
+### Get results with proxy
+Get resource saved and mime-type by proxy
 
-```py
+```python
 res = html2canvasproxy.resource(real_path, image)
 
 print res['mime']
