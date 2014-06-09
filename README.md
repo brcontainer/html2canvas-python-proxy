@@ -19,6 +19,7 @@ Module | Description
 --- | ---
 `html2canvasproxy([callback get param], [url get param])` | Config html2canvasproxy
 `html2canvasproxy.userAgent([user agent])` | Config webbrowser user-agent
+`html2canvasproxy.hostName([url])` | Config current URL (requires scheme and port)
 `html2canvasproxy.referer([referer])` | Config referer page (If needed)
 `html2canvasproxy.route([real path], [virtual path])` | Config "route" for images and real path (folder to save images). Note: "real path" is absolute path eg. `/home/user/project1/images`, "virtual path" should be as you want it to appear in the "address bar", eg. `/images`
 `html2canvasproxy.debug_vars()` | Get variables values for DEBUG
@@ -39,6 +40,9 @@ if request.headers['user_agent']:
     h2c.userAgent(request.headers['user_agent'])
 else:
     h2c.userAgent('Mozilla/5.0')
+
+#Set current page
+h2c.hostName(request.url)
 
 #Set referer (If needed)
 if request.referer:
