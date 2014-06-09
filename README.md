@@ -15,15 +15,49 @@ You do not use PHP, but need html2canvas working with proxy, see other proxies:
 
 ### Provisional documentation:
 
-Module | Description | Usage/Example
---- | --- | ---
-* | For import module, add this in your .py file (on document top) | `from html2canvasproxy import *`
-html2canvasproxy([callback get param], [url get param]) | Config html2canvasproxy | `h2c = html2canvasproxy(request.args.get("callback"), request.args.get("url"))`
-html2canvasproxy.userAgent([user agent]) | Config webbrowser user-agent | `h2c.userAgent(request.headers['user_agent'])`
-`html2canvasproxy.referer([referer])` | Config referer page (If needed) | `h2c.referer(request.referer)`
-`html2canvasproxy.route([real path], [virtual path])` | Config "route" for images and real path (folder to save images). Note: "real path" is absolute path eg. `/home/user/project1/images`, "virtual path" should be as you want it to appear in the "address bar", eg. `/images` | `h2c.route('/home/guilherme/projects/site/images', '/images')`
-`html2canvasproxy.result()` | Run proxy/Get response and mime-type by proxy | Read [Get results with proxy]
-`html2canvasproxy.resource([real path], [image])` | Get resource saved and mime-type by proxy "real path" is same in `html2canvas.route([real path], [virtual path])` | Read [Get resources with proxy]
+Module | Description
+--- | ---
+`html2canvasproxy([callback get param], [url get param])` | Config html2canvasproxy
+`html2canvasproxy.userAgent([user agent])` | Config webbrowser user-agent
+`html2canvasproxy.referer([referer])` | Config referer page (If needed)
+`html2canvasproxy.route([real path], [virtual path])` | Config "route" for images and real path (folder to save images). Note: "real path" is absolute path eg. `/home/user/project1/images`, "virtual path" should be as you want it to appear in the "address bar", eg. `/images`
+`html2canvasproxy.debug_vars()` | Get variables values for DEBUG
+`html2canvasproxy.result()` | Run proxy/Get response and mime-type by proxy.
+`html2canvasproxy.resource([real path], [image])` | Get resource saved and mime-type by proxy "real path" is same in `html2canvas.route([real path], [virtual path])`. Read [Get resources with proxy]
+
+### How to use 
+A simple example of usage
+
+```python
+from html2canvasproxy import * #Load html2canvasproxy
+
+#Set GET variables
+h2c = html2canvasproxy(request.args.get("callback"), request.args.get("url"))
+
+#Set user-aget browser
+if request.headers['user_agent']:
+    h2c.userAgent(request.headers['user_agent'])
+else:
+    h2c.userAgent('Mozilla/5.0')
+
+#Set referer (If needed)
+if request.referer:
+    h2c.referer(request.referer)
+
+#Set route (real path and virtual path)
+h2c.route('/home/guilherme/projects/site/images', '/images')
+
+#Results
+print 'Debug:'
+print h2c.debug_vars()
+print '---------'
+
+result = h2c.request()
+
+print 'mime: ' + result['mime']
+print 'data: ' + result['data']
+print '=========\n'
+```
 
 ### Get results with proxy
 Run proxy/Get response and mime-type by proxy
