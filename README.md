@@ -37,11 +37,7 @@ Config "route" for images and real path (folder to save images):
 
 `h2c.route([real path], [virtual path])`
 
-Run proxy:
-
-`r = h2c.result()`
-
-Get response and mime-type by proxy:
+Run proxy/Get response and mime-type by proxy:
 
 ```py
 r = h2c.result()
@@ -50,10 +46,7 @@ print r['mime']
 print r['data']
 ```
 
-Get resource saved:
-`res = html2canvasproxy.resource(real_path, image)`
-
-Get resource and mime-type saved by proxy:
+Get resource saved and mime-type by proxy:
 
 ```py
 res = html2canvasproxy.resource(real_path, image)
