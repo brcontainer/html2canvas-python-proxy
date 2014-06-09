@@ -1,7 +1,9 @@
-# html2canvas-python-proxy 0.0.2
+# html2canvas-python-proxy 0.0.3
 # Copyright (c) 2014 Guilherme Nascimento (brcontainer@yahoo.com.br)
 #
 # Released under the MIT license
+#
+# Fixed h.referer, added .debug, added hostName, fixed mime-type in .resource
 
 import random
 import time
@@ -159,24 +161,24 @@ class html2canvasproxy:
             self.status = 2
             self.response = str(resp)
 
-    def debug_variables(self):
+    def debug_vars(self):
         return [
-            'folder => ' + self.folder,
-            'timeout => ' + self.timeout,
-            'mimetype => ' + self.mimetype,
-            'ua => ' + self.ua,
-            'host => ' + self.host,
-            'scheme => ' + self.scheme,
-            'ref => ' + self.ref,
-            'url => ' + self.url,
-            'callback => ' + self.callback,
-            'default_callback => ' + self.default_callback,
-            'status => ' + self.status,
-            'routePath => ' + self.routePath,
-            'savePath => ' + self.savePath,
-            'prefix => ' + self.prefix,
-            'real_extension => ' + self.real_extension,
-            'mimes => ' + self.mimes
+            'folder => ' + str(self.folder),
+            'timeout => ' + str(self.timeout),
+            'mimetype => ' + str(self.mimetype),
+            'ua => ' + str(self.ua),
+            'host => ' + str(self.host),
+            'scheme => ' + str(self.scheme),
+            'ref => ' + str(self.ref),
+            'url => ' + str(self.url),
+            'callback => ' + str(self.callback),
+            'default_callback => ' + str(self.default_callback),
+            'status => ' + str(self.status),
+            'routePath => ' + str(self.routePath),
+            'savePath => ' + str(self.savePath),
+            'prefix => ' + str(self.prefix),
+            'real_extension => ' + str(self.real_extension),
+            'mimes => ' + str(self.mimes)
         ]
 
     @staticmethod
