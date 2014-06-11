@@ -15,7 +15,7 @@ app = Flask(__name__, static_folder='static', static_url_path='')
 app.config['DEBUG'] = True
 
 h2c = None
-real_path = os.getcwd() + '/images' #eg.: /home/guilherme/project1/images
+real_path = os.path.dirname(os.path.realpath(__file__)) + '/images' #eg.: /home/guilherme/project1/images, in Window Machine use +'\\images'
 virtual_path = '/test-case/html2canvas/images/' #In browser http://127.0.0.1/test-case/html2canvas/images/*
 
 @app.route('/')
@@ -42,7 +42,7 @@ def html2canvas_proxy():
     h2c.route(real_path, virtual_path)
 
     if request.args.get('debug_vars'): #
-        return Response((',\n'.join(h2c.debug_vars())), mimetype='text/plain')
+        return Response(str(h2c.debug_vars()), mimetype='text/plain')
 
     r = h2c.result()
 
