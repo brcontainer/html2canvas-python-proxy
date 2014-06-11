@@ -1,4 +1,4 @@
-# html2canvas-python-proxy 0.0.4
+# html2canvas-python-proxy 0.0.5
 # Copyright (c) 2014 Guilherme Nascimento (brcontainer@yahoo.com.br)
 #
 # Released under the MIT license
@@ -64,7 +64,7 @@ class html2canvasproxy:
         if self.ref == '':
             headers = { 'User-Agent' : self.ua }
         else:
-            o = urlparse.urlparse(self.referer)
+            o = urlparse.urlparse(self.ref)
             self.scheme = o.scheme
             self.host = o.netloc
 
@@ -78,7 +78,7 @@ class html2canvasproxy:
                 if re.match('^(image|text|application)\/', h['Content-Type']) is None:
                     self.setResponse('error:Invalid mime-type: ' + h['Content-Type'])
                 else:
-                    mime = str(re.sub('[;]([\s\S]+)$', '', h['Content-Type'])).strip()
+                    mime = str(re.sub('[;]([\s\S]+)$', '', h['Content-Type'])).strip().lower()
                     mime = re.sub('/x-', '/', mime)
 
                     if mime in self.mimes:
@@ -159,6 +159,9 @@ class html2canvasproxy:
                     self.routePath = '/' + route
                 else:
                     self.routePath = route
+
+                if re.match('/$', self.routePath) is None:
+                    self.routePath = self.routePath + '/'
 
     def userAgent(self, ua):
         self.ua = ua
