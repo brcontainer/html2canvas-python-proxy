@@ -1,4 +1,4 @@
-# html2canvas-python-proxy 0.0.3
+# html2canvas-python-proxy 0.0.4
 # Copyright (c) 2014 Guilherme Nascimento (brcontainer@yahoo.com.br)
 #
 # Released under the MIT license
@@ -29,10 +29,12 @@ class html2canvasproxy:
     response = ''
     default_callback = 'console.log'
     status = 0
-    routePath = ''
+    routePath = '/'
     savePath = '/'
     prefix = 'htc_'
     real_extension = ''
+    init_exec = time.time()
+    ccache = 60 * 5 * 1000
     mimes = [
         'image/bmp', 'image/windows-bmp', 'image/ms-bmp',
         'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
@@ -60,16 +62,15 @@ class html2canvasproxy:
 
     def downloadSource(self):
         if self.ref == '':
-            #o = urlparse.urlparse(self.referer)
-            #self.scheme = o.scheme
-            #self.host = o.netloc
-
             headers = { 'User-Agent' : self.ua }
         else:
+            o = urlparse.urlparse(self.referer)
+            self.scheme = o.scheme
+            self.host = o.netloc
+
             headers = { 'User-Agent' : self.ua, 'Referer': self.ref }
 
         try:
-
             req = urllib2.Request(self.url, None, headers)
             r = urllib2.urlopen(req)
             h = r.info()
@@ -98,9 +99,15 @@ class html2canvasproxy:
         except urllib2.URLError, e:
             self.setResponse('error:SOCKET: ' + str(e.reason))
 
+    def remove_old_files(self):
+        a = []
+        for f in os.listdir(self.savePath):
+            if f.find(self.prefix) == 0 and os.path.isfile(self.savePath + f) and ((self.init_exec - os.path.getctime(self.savePath + f))) > (self.ccache * 2):
+                os.unlink(self.savePath + f)
+
     def saveFile(self):
         file_name = hashlib.sha1(self.url).hexdigest()
-        tmp_ext = str(random.randrange(1000)) + '_' + str(time.time())
+        tmp_ext = str(random.randrange(1000)) + '_' + str(self.init_exec)
 
         if os.path.isfile(self.savePath + file_name + '.' + tmp_ext):
             self.saveFile() #try again
@@ -109,6 +116,9 @@ class html2canvasproxy:
             f.write(self.data)
             f.close()
 
+            if os.path.isfile(self.savePath + file_name + '.' + self.real_extension):
+                os.remove(self.savePath + file_name + '.' + self.real_extension)
+
             os.rename(self.savePath + file_name + '.' + tmp_ext, self.savePath + '/' + file_name + '.' + self.real_extension)
 
             self.setResponse(self.scheme + '://' + self.host + self.routePath + file_name + '.' + self.real_extension)
@@ -116,6 +126,8 @@ class html2canvasproxy:
     def hostName(self, url):
         if url == '' or url is None:
             self.setResponse('error:No such host in html2canvasproxy.hostName("url")')
+        if html2canvasproxy.isHttpUrl(url) == False:
+            self.setResponse('error:Only http scheme and https scheme are allowed in html2canvasproxy.hostName(' + url + ')')
         elif self.ref == '':
             o = urlparse.urlparse(url)
 
@@ -143,7 +155,10 @@ class html2canvasproxy:
                 self.setResponse('error:Not found ' + currentPath)
             else:
                 self.savePath = html2canvasproxy.fixPath(currentPath)
-                self.routePath = route
+                if re.match('^/', currentPath) is None:
+                    self.routePath = '/' + route
+                else:
+                    self.routePath = route
 
     def userAgent(self, ua):
         self.ua = ua
@@ -152,6 +167,7 @@ class html2canvasproxy:
         if self.response == '':
             self.initiate()
 
+        self.remove_old_files()
         return {'mime': self.mimetype, 'data': self.callback + '(' + json.dumps(self.response) + ');' }
 
     def setResponse(self, resp):
@@ -160,29 +176,12 @@ class html2canvasproxy:
             self.response = str(resp)
 
     def debug_vars(self):
-        return [
-            'folder => ' + str(self.folder),
-            'timeout => ' + str(self.timeout),
-            'mimetype => ' + str(self.mimetype),
-            'ua => ' + str(self.ua),
-            'host => ' + str(self.host),
-            'scheme => ' + str(self.scheme),
-            'ref => ' + str(self.ref),
-            'url => ' + str(self.url),
-            'callback => ' + str(self.callback),
-            'default_callback => ' + str(self.default_callback),
-            'status => ' + str(self.status),
-            'routePath => ' + str(self.routePath),
-            'savePath => ' + str(self.savePath),
-            'prefix => ' + str(self.prefix),
-            'real_extension => ' + str(self.real_extension),
-            'mimes => ' + str(self.mimes)
-        ]
+        return self.__dict__
 
     @staticmethod
     def fixPath(path):
         path = re.sub('(\/|\\\\)$', '', path)
-        if path.find('c:\\') == 0:
+        if re.match('[a-zA-Z][:]\\\\', path) is not None:
             return path + '\\'
         else:
             return path + '/'
