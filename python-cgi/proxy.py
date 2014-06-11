@@ -29,9 +29,8 @@ else:
 
 h2c.hostName(host)
 
-#if 'HTTP_REFERER' in os.environ:
-#h2c.referer('http://' + os.environ['HTTP_REFERER'])
-h2c.referer('http://localhost')
+if 'HTTP_REFERER' in os.environ:
+    h2c.referer(os.environ['HTTP_REFERER'])
 
 if 'HTTP_USER_AGENT' in os.environ:
     user_agent = os.environ['HTTP_USER_AGENT']
