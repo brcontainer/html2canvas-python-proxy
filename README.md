@@ -64,7 +64,7 @@ print '=========\n'
 ```
 
 ### Get results with proxy
-Run proxy/Get response and mime-type by proxy (returns json)
+Run proxy/Get response and mime-type by proxy (returns `application/javascript`)
 
 ```python
 r = h2c.result()
