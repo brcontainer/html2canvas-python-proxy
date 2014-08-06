@@ -24,7 +24,7 @@ Module | Description
 `html2canvasproxy.route([real path], [virtual path])` | Config "route" for images and real path (folder to save images). Note: "real path" is absolute path eg. `/home/user/project1/images`, "virtual path" should be as you want it to appear in the "address bar", eg. `/images`
 `html2canvasproxy.debug_vars()` | Get variables values for DEBUG
 `html2canvasproxy.result()` | Run proxy/Get response and mime-type by proxy.
-`html2canvasproxy.resource([real path], [image])` | Get resource saved and mime-type by proxy "real path" is same in `html2canvas.route([real path], [virtual path])`. Read [Get resources with proxy]
+`html2canvasproxy.resource([real path], [image])` | Get resource saved and mime-type by proxy "real path" is same in `html2canvas.route([real path], [virtual path])`. Read [Get resources with proxy](https://github.com/brcontainer/html2canvas-python-proxy#get-results-with-proxy)
 
 ### How to use 
 A simple example of usage
@@ -64,7 +64,7 @@ print '=========\n'
 ```
 
 ### Get results with proxy
-Run proxy/Get response and mime-type by proxy
+Run proxy/Get response and mime-type by proxy (returns json)
 
 ```python
 r = h2c.result()
@@ -74,7 +74,7 @@ print r['data']
 ```
 
 ### Get resources with proxy
-Get resource saved and mime-type by proxy
+Get resource saved and mime-type by proxy (returns images or html)
 
 ```python
 res = html2canvasproxy.resource(real_path, image)
