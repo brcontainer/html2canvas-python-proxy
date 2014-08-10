@@ -1,4 +1,4 @@
-# html2canvas-python-proxy 0.0.5
+# html2canvas-python-proxy 0.0.6
 # Copyright (c) 2014 Guilherme Nascimento (brcontainer@yahoo.com.br)
 #
 # Released under the MIT license
@@ -8,6 +8,7 @@ import time
 import hashlib
 import urllib2
 import urlparse
+import base64
 import json
 import re
 import os
@@ -24,6 +25,8 @@ class html2canvasproxy:
     scheme = ''
     ref = ''
     url = ''
+    http_username = ''
+    http_password = ''
     callback = ''
     data = ''
     response = ''
@@ -52,7 +55,24 @@ class html2canvasproxy:
             self.setResponse('error:Only http scheme and https scheme are allowed (' + url + ')')
         else:
             self.callback = callback
-            self.url = url
+
+            o = urlparse.urlparse(url)
+
+            if o.query != '':
+                self.url += '?' + o.query
+
+            if o.username is not None:
+                self.http_username = o.username
+
+            if o.password is not None:
+                self.http_password = o.password
+
+            if self.http_username != '' or self.http_password != '':
+                uri = (o.netloc.split('@'))[1]
+            else:
+                uri = o.netloc
+
+            self.url = o.scheme + "://" + uri + o.path
 
     def initiate(self):
         if self.status != 0:
@@ -61,19 +81,26 @@ class html2canvasproxy:
         self.downloadSource()
 
     def downloadSource(self):
-        if self.ref == '':
-            headers = { 'User-Agent' : self.ua }
-        else:
+        headers = { 'User-Agent' : self.ua }
+        if self.ref != '':
             o = urlparse.urlparse(self.ref)
             self.scheme = o.scheme
             self.host = o.netloc
 
-            headers = { 'User-Agent' : self.ua, 'Referer': self.ref }
+            headers['Referer'] = self.ref
+
+        if self.http_username != '' or self.http_password != '':
+            auth = self.http_username + ':' + self.http_password
+            auth = auth.encode('ascii')
+            auth = base64.b64encode(auth)
+
+            headers['Authorization'] = 'Basic ' + auth
 
         try:
             req = urllib2.Request(self.url, None, headers)
             r = urllib2.urlopen(req)
             h = r.info()
+
             if h['Content-Type'] != '' and h['Content-Type'] != None:
                 if re.match('^(image|text|application)\/', h['Content-Type']) is None:
                     self.setResponse('error:Invalid mime-type: ' + h['Content-Type'])
