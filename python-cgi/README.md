@@ -8,6 +8,6 @@
     Order allow,deny
     Allow from all
     AddHandler cgi-script .py
-    AddHandler default-handler .html .htm .gif .png .bmp .jpg .jpeg #added support for images
+	AddHandler default-handler .xhtml .html .htm .gif .png .bmp .jpg .svg #added support for images and "xml/html"
 </Directory>
 ```
