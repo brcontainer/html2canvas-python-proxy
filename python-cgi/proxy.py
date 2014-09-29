@@ -22,6 +22,8 @@ virtual_path = 'cgi-bin/html2canvas/images'
 
 h2c = html2canvasproxy(callback, url)
 
+#h2c.enableCrossDomain() #Uncomment this line to enable the use of "Data URI scheme"
+
 if 'HTTP_HOST' in os.environ:
     host = 'http://' + os.environ['HTTP_HOST']
 else:
