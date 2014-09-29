@@ -33,6 +33,9 @@ def html2canvas_js():
 @app.route('/test-case/html2canvas-proxy')
 def html2canvas_proxy():
     h2c = html2canvasproxy(request.args.get('callback'), request.args.get('url'))
+
+    #h2c.enableCrossDomain() #Uncomment this line to enable the use of "Data URI scheme"
+
     h2c.userAgent(request.headers['user_agent'])
     h2c.hostName(request.url)
 
