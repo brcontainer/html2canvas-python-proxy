@@ -1,4 +1,4 @@
-# html2canvas-python-proxy 0.0.6
+# html2canvas-python-proxy 0.0.7
 # Copyright (c) 2014 Guilherme Nascimento (brcontainer@yahoo.com.br)
 #
 # Released under the MIT license
@@ -36,12 +36,16 @@ class html2canvasproxy:
     savePath = '/'
     prefix = 'htc_'
     real_extension = ''
+    real_mimetype = ''
+    real_charset = ''
     init_exec = time.time()
     ccache = 60 * 5 * 1000
+    cross_domain = False
     mimes = [
         'image/bmp', 'image/windows-bmp', 'image/ms-bmp',
         'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
-        'text/html', 'application/xhtml', 'application/xhtml+xml'
+        'text/html', 'application/xhtml', 'application/xhtml+xml',
+        'image/svg+xml', 'image/svg-xml'
     ]
 
     def __init__(self, callback, url):
@@ -73,6 +77,9 @@ class html2canvasproxy:
                 uri = o.netloc
 
             self.url = o.scheme + "://" + uri + o.path
+
+    def enableCrossDomain(self):
+        self.cross_domain = True;
 
     def initiate(self):
         if self.status != 0:
@@ -111,11 +118,22 @@ class html2canvasproxy:
                     if mime in self.mimes:
                         self.data = r.read()
 
-                        mime = re.sub('^(image|text|application)\/', '', mime)
-                        mime = re.sub('(windows-bmp|ms-bmp)', 'bmp', mime)
-                        mime = mime.replace('xhtml+xml', 'xhtml')
-                        mime = mime.replace('jpeg', 'jpg')
-                        self.real_extension = mime
+                        extension = re.sub('^(image|text|application)\/', '', mime)
+                        extension = re.sub('(windows[-]bmp|ms[-]bmp)', 'bmp', extension)
+                        extension = re.sub('(svg[+]xml|svg[-]xml)', 'svg', extension)
+                        extension = extension.replace('xhtml[+]xml', 'xhtml')
+                        extension = extension.replace('jpeg', 'jpg')
+
+                        self.real_extension = extension
+                        self.real_mimetype  = mime
+
+                        cp = h['Content-Type'].find(';');
+
+                        if cp != -1:
+                            cp = cp + 1
+                            charset = h['Content-Type']
+                            self.real_charset = ';' + charset[cp:].strip()
+
                         self.saveFile()
                     else:
                         self.setResponse('error:Invalid mime-type: ' + h['Content-Type'])
@@ -139,7 +157,7 @@ class html2canvasproxy:
         if os.path.isfile(self.savePath + file_name + '.' + tmp_ext):
             self.saveFile() #try again
         else:
-            f = open(self.savePath + file_name + '.' + tmp_ext,'wb')
+            f = open(self.savePath + file_name + '.' + tmp_ext, 'wb')
             f.write(self.data)
             f.close()
 
@@ -164,6 +182,7 @@ class html2canvasproxy:
     def referer(self, url):
         if url == '' or url is None:
             self.setResponse('error:No such referer in html2canvasproxy.referer("url")')
+        
         if html2canvasproxy.isHttpUrl(url) == False:
             self.setResponse('error:Only http scheme and https scheme are allowed in html2canvasproxy.referer(' + url + ')')
         else:
@@ -198,7 +217,27 @@ class html2canvasproxy:
             self.initiate()
 
         self.remove_old_files()
-        return {'mime': self.mimetype, 'data': self.callback + '(' + json.dumps(self.response) + ');' }
+
+        if self.cross_domain:
+            duheader = re.sub('(^"|"$)', '',
+				json.dumps(self.real_mimetype + self.real_charset)
+            )
+
+            if self.real_extension == 'svg' or re.match('^image/', self.real_mimetype) is None:
+                return {
+                    'mime': self.mimetype,
+                    'data': self.callback + '("data:' + duheader + ',' + html2canvasproxy.asciiToInline(self.data) + '");'
+                }
+            else:
+                return {
+                    'mime': self.mimetype,
+                    'data': self.callback + '("data:' + duheader + ';base64,' + base64.b64encode(self.data) + '");'
+                }
+        else:
+            return {
+                'mime': self.mimetype,
+                'data': self.callback + '(' + json.dumps(self.response) + ');'
+            }
 
     def setResponse(self, resp):
         if self.response == '':
@@ -207,6 +246,30 @@ class html2canvasproxy:
 
     def debug_vars(self):
         return self.__dict__
+
+    @staticmethod
+    def asciiToInline(str):
+        i = 0;
+        x = {
+            '\n': '%0A',
+            '\r': '%0D',
+            ' ': '%20',
+            '"': '%22',
+            '#': '%23',
+            '&': '%26',
+            '\/': '%2F',
+            '\\': '%5C',
+            ':': '%3A',
+            '?': '%3F',
+            '\0': '%00',
+            '\b': '',
+            '\t': '%09'
+		}
+
+        for (k, v) in x.items():
+            str = str.replace(k, v)
+
+        return str;
 
     @staticmethod
     def fixPath(path):
@@ -231,6 +294,8 @@ class html2canvasproxy:
                 mime = 'image/' + ext
             elif ext == 'xhtml':
                 mime = 'application/xml+xhtml'
+            elif ext == 'svg':
+                mime = 'image/svg+xml'
             elif ext == 'html':
                 mime = 'text/html'
 
@@ -238,7 +303,7 @@ class html2canvasproxy:
             data = f.read()
             f.close()
 
-            return {'mime': mime, 'data': data}
+            return { 'mime': mime, 'data': data }
         else:
             return None
 
