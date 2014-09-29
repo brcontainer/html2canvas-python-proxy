@@ -1,4 +1,4 @@
-html2canvas-python-proxy
+html2canvas-python-proxy 0.0.7
 ========================
 
 Python Proxy for html2canvas (tested in Python 2.7.3)
@@ -18,6 +18,7 @@ You do not use PHP, but need html2canvas working with proxy, see other proxies:
 Module | Description
 --- | ---
 `html2canvasproxy([callback get param], [url get param])` | Config html2canvasproxy
+`html2canvasproxy.enableCrossDomain()` | Enable the use of ["Data URI scheme"](http://en.wikipedia.org/wiki/Data_URI_scheme)
 `html2canvasproxy.userAgent([user agent])` | Config webbrowser user-agent
 `html2canvasproxy.hostName([url])` | Config current URL (requires scheme and port)
 `html2canvasproxy.referer([referer])` | Config referer page (If needed)
@@ -34,6 +35,9 @@ from html2canvasproxy import * #Load html2canvasproxy
 
 #Set GET variables
 h2c = html2canvasproxy(request.args.get("callback"), request.args.get("url"))
+
+#Uncomment next line to enable "data URI scheme" (optional)
+#h2c.enableCrossDomain()
 
 #Set user-aget browser
 if request.headers['user_agent']:
