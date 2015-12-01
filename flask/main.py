@@ -25,7 +25,7 @@ def index():
 @app.route('/test-case/')
 def test_case():
     return app.send_static_file('test-case.html')
-    
+
 @app.route('/test-case/html2canvas.js')
 def html2canvas_js():
     return app.send_static_file('html2canvas.js')
@@ -34,10 +34,10 @@ def html2canvas_js():
 def html2canvas_proxy():
     h2c = html2canvasproxy(request.args.get('callback'), request.args.get('url'))
 
-    #h2c.enableCrossDomain() #Uncomment this line to enable the use of "Data URI scheme"
+    #h2c.enable_crossdomain() #Uncomment this line to enable the use of "Data URI scheme"
 
-    h2c.userAgent(request.headers['user_agent'])
-    h2c.hostName(request.url)
+    h2c.useragent(request.headers['user_agent'])
+    h2c.hostname(request.url)
 
     if request.referrer is not None:
         h2c.referer(request.referrer)
@@ -58,7 +58,12 @@ def images(image):
     if res is None:
         return '', 404
     else:
-        return Response(res['data'], mimetype=res['mime'])
+        return Response(res['data'], mimetype=res['mime'], headers={
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Request-Method': '*',
+            'Access-Control-Allow-Methods': 'OPTIONS, GET',
+            'Access-Control-Allow-Headers': '*'
+        })
 
 if __name__ == '__main__':
     app.run()

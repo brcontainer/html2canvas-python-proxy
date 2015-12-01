@@ -32,8 +32,8 @@ class html2canvasproxy:
     response = ''
     default_callback = 'console.log'
     status = 0
-    routePath = '/'
-    savePath = '/'
+    route_path = '/'
+    save_path = '/'
     prefix = 'htc_'
     real_extension = ''
     real_mimetype = ''
@@ -50,20 +50,17 @@ class html2canvasproxy:
 
     def __init__(self, callback, url):
         if callback == '' or callback is None:
-            self.setResponse('error:No such parameter "callback"')
+            self.set_response('error:No such parameter "callback"')
         elif re.match('[^A-Za-z0-9_[.]\\[\\]]', callback) is not None:
-            self.setResponse('error:Parameter "callback" contains invalid characters (' + callback + ')')
+            self.set_response('error:Parameter "callback" contains invalid characters (' + callback + ')')
         elif url == '' or url is None:
-            self.setResponse('error:No such parameter "url"')
-        elif html2canvasproxy.isHttpUrl(url) == False:
-            self.setResponse('error:Only http scheme and https scheme are allowed (' + url + ')')
+            self.set_response('error:No such parameter "url"')
+        elif html2canvasproxy.is_http_url(url) == False:
+            self.set_response('error:Only http scheme and https scheme are allowed (' + url + ')')
         else:
             self.callback = callback
 
             o = urlparse.urlparse(url)
-
-            if o.query != '':
-                self.url += '?' + o.query
 
             if o.username is not None:
                 self.http_username = o.username
@@ -76,19 +73,23 @@ class html2canvasproxy:
             else:
                 uri = o.netloc
 
-            self.url = o.scheme + "://" + uri + o.path
+            self.url = o.scheme + '://' + uri + o.path
 
-    def enableCrossDomain(self):
+            if o.query != '':
+                self.url += '?' + o.query
+
+    def enable_crossdomain(self):
         self.cross_domain = True;
 
     def initiate(self):
         if self.status != 0:
             return None
 
-        self.downloadSource()
+        self.download_source()
 
-    def downloadSource(self):
+    def download_source(self):
         headers = { 'User-Agent' : self.ua }
+
         if self.ref != '':
             o = urlparse.urlparse(self.ref)
             self.scheme = o.scheme
@@ -110,7 +111,7 @@ class html2canvasproxy:
 
             if h['Content-Type'] != '' and h['Content-Type'] != None:
                 if re.match('^(image|text|application)\/', h['Content-Type']) is None:
-                    self.setResponse('error:Invalid mime-type: ' + h['Content-Type'])
+                    self.set_response('error:Invalid mime-type: ' + h['Content-Type'])
                 else:
                     mime = str(re.sub('[;]([\s\S]+)$', '', h['Content-Type'])).strip().lower()
                     mime = re.sub('/x-', '/', mime)
@@ -134,57 +135,57 @@ class html2canvasproxy:
                             charset = h['Content-Type']
                             self.real_charset = ';' + charset[cp:].strip()
 
-                        self.saveFile()
+                        self.save_file()
                     else:
-                        self.setResponse('error:Invalid mime-type: ' + h['Content-Type'])
+                        self.set_response('error:Invalid mime-type: ' + h['Content-Type'])
             else:
-                self.setResponse('error:No mime-type defined')
+                self.set_response('error:No mime-type defined')
 
             r.close()
         except urllib2.URLError, e:
-            self.setResponse('error:SOCKET: ' + str(e.reason))
+            self.set_response('error:SOCKET: ' + str(e.reason))
 
     def remove_old_files(self):
         a = []
-        for f in os.listdir(self.savePath):
-            if f.find(self.prefix) == 0 and os.path.isfile(self.savePath + f) and ((self.init_exec - os.path.getctime(self.savePath + f))) > (self.ccache * 2):
-                os.unlink(self.savePath + f)
+        for f in os.listdir(self.save_path):
+            if f.find(self.prefix) == 0 and os.path.isfile(self.save_path + f) and ((self.init_exec - os.path.getctime(self.save_path + f))) > (self.ccache * 2):
+                os.unlink(self.save_path + f)
 
-    def saveFile(self):
+    def save_file(self):
         file_name = hashlib.sha1(self.url).hexdigest()
         tmp_ext = str(random.randrange(1000)) + '_' + str(self.init_exec)
 
-        if os.path.isfile(self.savePath + file_name + '.' + tmp_ext):
-            self.saveFile() #try again
+        if os.path.isfile(self.save_path + file_name + '.' + tmp_ext):
+            self.save_file() #try again
         else:
-            f = open(self.savePath + file_name + '.' + tmp_ext, 'wb')
+            f = open(self.save_path + file_name + '.' + tmp_ext, 'wb')
             f.write(self.data)
             f.close()
 
-            if os.path.isfile(self.savePath + file_name + '.' + self.real_extension):
-                os.remove(self.savePath + file_name + '.' + self.real_extension)
+            if os.path.isfile(self.save_path + file_name + '.' + self.real_extension):
+                os.remove(self.save_path + file_name + '.' + self.real_extension)
 
-            os.rename(self.savePath + file_name + '.' + tmp_ext, self.savePath + '/' + file_name + '.' + self.real_extension)
+            os.rename(self.save_path + file_name + '.' + tmp_ext, self.save_path + file_name + '.' + self.real_extension)
 
-            self.setResponse(self.scheme + '://' + self.host + self.routePath + file_name + '.' + self.real_extension)
+            self.set_response(self.scheme + '://' + self.host + self.route_path + file_name + '.' + self.real_extension)
 
-    def hostName(self, url):
+    def hostname(self, url):
         if url == '' or url is None:
-            self.setResponse('error:No such host in html2canvasproxy.hostName("url")')
-        if html2canvasproxy.isHttpUrl(url) == False:
-            self.setResponse('error:Only http scheme and https scheme are allowed in html2canvasproxy.hostName(' + url + ')')
+            self.set_response('error:No such host in html2canvasproxy.hostname("url")')
+        if html2canvasproxy.is_http_url(url) == False:
+            self.set_response('error:Only http scheme and https scheme are allowed in html2canvasproxy.hostname(' + url + ')')
         elif self.ref == '':
             o = urlparse.urlparse(url)
 
             self.scheme = o.scheme
             self.host = o.netloc
-        
+
     def referer(self, url):
         if url == '' or url is None:
-            self.setResponse('error:No such referer in html2canvasproxy.referer("url")')
-        
-        if html2canvasproxy.isHttpUrl(url) == False:
-            self.setResponse('error:Only http scheme and https scheme are allowed in html2canvasproxy.referer(' + url + ')')
+            self.set_response('error:No such referer in html2canvasproxy.referer("url")')
+
+        if html2canvasproxy.is_http_url(url) == False:
+            self.set_response('error:Only http scheme and https scheme are allowed in html2canvasproxy.referer(' + url + ')')
         else:
             self.ref = url
 
@@ -193,23 +194,19 @@ class html2canvasproxy:
             self.scheme = o.scheme
             self.host = o.netloc
 
-    def route(self, currentPath, route):
-        if re.match('(^/|[a-zA-Z][:])', currentPath) is None:
-            self.setResponse('error:Invalid currentPath (' + currentPath + ')')
+    def route(self, current_path, route):
+        if re.match('(^/|[a-zA-Z][:])', current_path) is None:
+            self.set_response('error:Invalid current_path (' + current_path + ')')
         else:
-            if not os.path.isdir(currentPath):
-                self.setResponse('error:Not found ' + currentPath)
+            current_path = current_path.replace('\\', '/')
+
+            if not os.path.isdir(current_path):
+                self.set_response('error:Not found ' + current_path)
             else:
-                self.savePath = html2canvasproxy.fixPath(currentPath)
-                if re.match('^/', currentPath) is None:
-                    self.routePath = '/' + route
-                else:
-                    self.routePath = route
+                self.save_path = html2canvasproxy.fix_path(current_path)
+                self.route_path = '/' + route.strip('/') + '/';
 
-                if re.match('/$', self.routePath) is None:
-                    self.routePath = self.routePath + '/'
-
-    def userAgent(self, ua):
+    def useragent(self, ua):
         self.ua = ua
 
     def result(self):
@@ -226,7 +223,7 @@ class html2canvasproxy:
             if self.real_extension == 'svg' or re.match('^image/', self.real_mimetype) is None:
                 return {
                     'mime': self.mimetype,
-                    'data': self.callback + '("data:' + duheader + ',' + html2canvasproxy.asciiToInline(self.data) + '");'
+                    'data': self.callback + '("data:' + duheader + ',' + html2canvasproxy.ascii_to_inline(self.data) + '");'
                 }
             else:
                 return {
@@ -239,7 +236,7 @@ class html2canvasproxy:
                 'data': self.callback + '(' + json.dumps(self.response) + ');'
             }
 
-    def setResponse(self, resp):
+    def set_response(self, resp):
         if self.response == '':
             self.status = 2
             self.response = str(resp)
@@ -248,7 +245,7 @@ class html2canvasproxy:
         return self.__dict__
 
     @staticmethod
-    def asciiToInline(str):
+    def ascii_to_inline(str):
         i = 0;
         x = {
             '\n': '%0A',
@@ -272,7 +269,7 @@ class html2canvasproxy:
         return str;
 
     @staticmethod
-    def fixPath(path):
+    def fix_path(path):
         path = re.sub('(\/|\\\\)$', '', path)
         if re.match('[a-zA-Z][:]\\\\', path) is not None:
             return path + '\\'
@@ -280,10 +277,10 @@ class html2canvasproxy:
             return path + '/'
 
     @staticmethod
-    def resource(currentPath, f):
-        currentPath = html2canvasproxy.fixPath(currentPath)
+    def resource(current_path, f):
+        current_path = html2canvasproxy.fix_path(current_path)
 
-        if os.path.isfile(currentPath + f):
+        if os.path.isfile(current_path + f):
             fileName, ext = os.path.splitext(f)
 
             mime = 'application/octet-stream'
@@ -299,8 +296,10 @@ class html2canvasproxy:
             elif ext == 'html':
                 mime = 'text/html'
 
-            f = open(currentPath + '/' + f)
-            data = f.read()
+            fullpath = current_path + '/' + f
+
+            f = open(fullpath, 'rb')
+            data = f.read(os.stat(fullpath).st_size)
             f.close()
 
             return { 'mime': mime, 'data': data }
@@ -308,5 +307,5 @@ class html2canvasproxy:
             return None
 
     @staticmethod
-    def isHttpUrl(url):
+    def is_http_url(url):
         return re.match('^http(|s)[:][/][/][a-zA-Z0-9]', url) is not None

@@ -22,14 +22,14 @@ virtual_path = 'cgi-bin/html2canvas/images'
 
 h2c = html2canvasproxy(callback, url)
 
-#h2c.enableCrossDomain() #Uncomment this line to enable the use of "Data URI scheme"
+#h2c.enable_crossdomain() #Uncomment this line to enable the use of "Data URI scheme"
 
 if 'HTTP_HOST' in os.environ:
     host = 'http://' + os.environ['HTTP_HOST']
 else:
     host = 'http://localhost' #alternative HOST, define your domain eg. http://mywebsite.io
 
-h2c.hostName(host)
+h2c.hostname(host)
 
 if 'HTTP_REFERER' in os.environ:
     h2c.referer(os.environ['HTTP_REFERER'])
@@ -37,7 +37,7 @@ if 'HTTP_REFERER' in os.environ:
 if 'HTTP_USER_AGENT' in os.environ:
     user_agent = os.environ['HTTP_USER_AGENT']
 else:
-    h2c.userAgent('Mozilla/5.0')
+    h2c.useragent('Mozilla/5.0')
 
 h2c.route(real_path, virtual_path)
 
