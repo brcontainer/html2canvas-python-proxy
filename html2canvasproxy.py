@@ -1,5 +1,5 @@
-# html2canvas-python-proxy 0.0.7
-# Copyright (c) 2014 Guilherme Nascimento (brcontainer@yahoo.com.br)
+# html2canvas-python-proxy 0.1.0
+# Copyright (c) 2017 Guilherme Nascimento (brcontainer@yahoo.com.br)
 #
 # Released under the MIT license
 
@@ -30,7 +30,6 @@ class html2canvasproxy:
     callback = ''
     data = ''
     response = ''
-    default_callback = 'console.log'
     status = 0
     route_path = '/'
     save_path = '/'
@@ -49,9 +48,7 @@ class html2canvasproxy:
     ]
 
     def __init__(self, callback, url):
-        if callback == '' or callback is None:
-            self.set_response('error:No such parameter "callback"')
-        elif re.match('[^A-Za-z0-9_[.]\\[\\]]', callback) is not None:
+        if callback is not None and re.match('[^A-Za-z0-9_[.]\\[\\]]', callback) is not None:
             self.set_response('error:Parameter "callback" contains invalid characters (' + callback + ')')
         elif url == '' or url is None:
             self.set_response('error:No such parameter "url"')
@@ -215,9 +212,14 @@ class html2canvasproxy:
 
         self.remove_old_files()
 
-        if self.cross_domain:
+        if self.callback is None:
+            return {
+                'mime': self.real_mimetype,
+                'data': self.data
+            }
+        elif self.cross_domain:
             duheader = re.sub('(^"|"$)', '',
-				json.dumps(self.real_mimetype + self.real_charset)
+                json.dumps(self.real_mimetype + self.real_charset)
             )
 
             if self.real_extension == 'svg' or re.match('^image/', self.real_mimetype) is None:
@@ -261,7 +263,7 @@ class html2canvasproxy:
             '\0': '%00',
             '\b': '',
             '\t': '%09'
-		}
+        }
 
         for (k, v) in x.items():
             str = str.replace(k, v)
