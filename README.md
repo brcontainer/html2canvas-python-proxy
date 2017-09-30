@@ -1,4 +1,4 @@
-html2canvas-python-proxy 0.0.8
+html2canvas-python-proxy 0.1.0
 ========================
 
 Python Proxy for html2canvas (tested in Python 2.7.3)
