@@ -60,7 +60,7 @@ print 'Debug:'
 print h2c.debug_vars()
 print '---------'
 
-result = h2c.request()
+result = h2c.result()
 
 print 'mime: ' + result['mime']
 print 'data: ' + result['data']
